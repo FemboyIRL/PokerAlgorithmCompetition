@@ -12,13 +12,30 @@ class Card:
 
 class Player:
     def __init__(self, name, balance, algorithm):
+        if balance < 0:
+            raise ValueError("El balance inicial no puede ser negativo.")
         self.name = name
         self.balance = balance  
         self.algorithm = algorithm
+        self.cards = []
 
     def make_decision(self, game_state):
         return self.algorithm.make_decision(game_state)
 
+    def add_cards(self, cards):
+        for card in cards:
+            if card not in self.cards:
+                self.cards.append(card)
+    
+    def reset_hand(self):
+        self.cards = []
+
+    def bet(self, amount):
+        if amount > self.balance:
+            raise ValueError(f"{self.name} no tiene suficiente balance para apostar {amount}.")
+        self.balance -= amount
+        return amount
+    
 class GameState:
     def __init__(self, players, deck, community_cards, current_bet, pot, round_number):
         self.players = players  # Lista de jugadores
@@ -43,9 +60,6 @@ def create_deck():
     for suit in suits:
         for i, rank in enumerate(ranks):
             deck.append(Card(i+2, rank, suit))
-    
-    for card in deck:
-        print(card)
 
     return deck
 
